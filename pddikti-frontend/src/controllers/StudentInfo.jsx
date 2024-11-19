@@ -28,16 +28,16 @@ const StudentInfo = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [studentDetails, setStudentDetails] = useState(null);
 
-  const debouncedNim = useDebounce(nim, 500);
+  const debouncedNim = useDebounce(nim, 1000);
 
   const fetchStudents = async (searchNim, page) => {
     if (!searchNim.trim()) {
       return;
     }
-
+  
     setLoading(true);
     setError(null);
-
+  
     Swal.fire({
       title: '',
       text: 'Fetching student data...',
@@ -47,22 +47,22 @@ const StudentInfo = () => {
         Swal.showLoading();
       }
     });
-
+  
     try {
       const response = await fetch(`https://pddikti-backend.vercel.app/search/${searchNim}?page=${page}&limit=${studentsPerPage}`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch students');
       }
-
+  
       const data = await response.json();
-      setStudents(data);
-      setTotalResults(data.length);
-
+      setStudents(data || []);  // Set default empty array
+      setTotalResults(data ? data.length : 0);
+  
       Swal.close();
     } catch (err) {
       setError(err.message);
-
+  
       Swal.fire({
         title: '',
         text: err.message,
@@ -72,7 +72,7 @@ const StudentInfo = () => {
     } finally {
       setLoading(false);
     }
-  };
+  };  
 
   useEffect(() => {
     if (debouncedNim) {
